@@ -12,11 +12,8 @@ library(glue) # String literals
 library(janitor) # Data wrangling
 library(keyring) # API key
 library(knitr) # Display dataframes
-library(leaflet) # Mapping
 library(purrr) # Data wrangling
-library(sf) # Mapping
 library(tidyr) # Data wrangling
-library(tigris) # Mapping
 
 # API key stored in my Mac's Keychain app
 api_eia <- key_get("EIA.gov")

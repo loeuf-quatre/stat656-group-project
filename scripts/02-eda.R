@@ -442,15 +442,21 @@ ec <- ec %>%
     mth = format(ds, "%m")
   )
 
-# Join datasets -------------------------------------------
-
-jds <- left_join(ng, ec, by = c("state", "ds", "mth", "yr"))
-
 # Data viz -------------------------------------------------------------------
 
 # Linear models by state ----------------------------------
 
-lms <- jds %>%
+ngsy <- ng %>%
+  group_by(
+    state,
+    yr
+  ) %>%
+  summarize(
+    output = sum(output, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ecsy <- ec %>%
   rename(
     revenue = revenue_from_retail_sales_of_electricity_million_dollars,
     sales = retail_sales_of_electricity_million_kilowatthours
@@ -460,13 +466,12 @@ lms <- jds %>%
     yr
   ) %>%
   summarize(
-    output = sum(output, na.rm = TRUE),
-    average_price = sum(revenue) / sum(sales),
+    average_price = sum(revenue, na.rm = TRUE) / sum(sales, na.rm = TRUE),
     .groups = "drop"
-  ) %>%
-  filter(
-    yr < 2022 # Only full years
   )
+
+lms <- left_join(ngsy, ecsy, by = c("state", "yr"))
+lms <- filter(lms, yr < 2022) # Only full years
 
 ggplot() +
   geom_point(
@@ -493,6 +498,6 @@ ggplot() +
     labels = function(x) scales::dollar(x, accuracy = .001)
   ) +
   labs(
-    x = "Output (Millions MWh)",
+    x = "Output GWh",
     y = "Average Price"
   )
