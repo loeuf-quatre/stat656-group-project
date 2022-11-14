@@ -5,9 +5,11 @@
 
 # Housekeeping ----------------------------------------------------------------
 
-library(dplyr)
-library(ggplot2)
-library(knitr)
+library(dplyr) # Data wrangling
+library(ggplot2) # Data viz
+library(knitr) # Inline data tables
+library(sf) # Mapping
+library(tidyr) # Data wrangling
 
 # Tidy data -------------------------------------------------------------------
 
@@ -223,6 +225,29 @@ ng %>%
     "simple"
   )
 
+# series_id                         n  last_updated          
+# ------------------------------  ---  ----------------------
+# ELEC.PLANT.GEN.10-DFO-ST.M        1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10-SC-ST.M         1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10003-SUB-ST.M     1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10004-OTH-ST.M     1  28-JUN-17 04.07.58 PM 
+# ELEC.PLANT.GEN.10008-NG-IC.M      1  28-JUN-17 04.07.58 PM 
+# ELEC.PLANT.GEN.10012-MSW-ST.M     1  28-JUN-17 04.07.58 PM 
+# ELEC.PLANT.GEN.10013-MSW-ST.M     1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10018-GEO-ST.M     1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10029-DFO-CT.M     1  28-JUN-17 04.07.58 PM 
+# ELEC.PLANT.GEN.10029-NG-CA.M      1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10029-NG-CT.M      1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10029-RFO-CA.M     1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10030-JF-GT.M      1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10030-NG-ST.M      1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10033-MSW-ST.M     1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.1004-BIT-ST.M      1  28-JUN-17 04.07.58 PM 
+# ELEC.PLANT.GEN.1004-DFO-ST.M      1  28-JUN-17 04.07.58 PM 
+# ELEC.PLANT.GEN.10042-NG-IC.M      1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.1006-DFO-IC.M      1  07-JUL-16 05.18.42 PM 
+# ELEC.PLANT.GEN.10061-DFO-CA.M     1  07-JUL-16 05.18.42 PM 
+
 "
 These also look like outdated series with no output for these specific plants
 "
@@ -267,6 +292,302 @@ kable(head(ng), "simple")
 # ELEC.PLANT.GEN.1-DFO-IC.M   (1) Sand Point (1)   megawatthours   Net generation   distillate fuel oil   internal combustion (diesel, piston) engine   monthly     55.339722   -160.497222   USA-AK      2019-04-01    198.082  23-SEP-22 12.11.30 PM   2019   04    AK    Alaska 
 # ELEC.PLANT.GEN.1-DFO-IC.M   (1) Sand Point (1)   megawatthours   Net generation   distillate fuel oil   internal combustion (diesel, piston) engine   monthly     55.339722   -160.497222   USA-AK      2019-05-01    215.578  23-SEP-22 12.11.30 PM   2019   05    AK    Alaska 
 # ELEC.PLANT.GEN.1-DFO-IC.M   (1) Sand Point (1)   megawatthours   Net generation   distillate fuel oil   internal combustion (diesel, piston) engine   monthly     55.339722   -160.497222   USA-AK      2019-06-01    185.236  23-SEP-22 12.11.30 PM   2019   06    AK    Alaska 
+
+# Check that output values make sense
+ng %>%
+  filter(
+    output <= 0
+  ) %>%
+  head() %>%
+  kable(
+    "simple"
+  )
+
+# series_id                    plant                     units           energy_type      energy_source     prime_mover     frequency   lat       lon        geography   ds            output  updated                 yr     mth   abb   state     fuel_cat1      fuel_cat2 
+# ---------------------------  ------------------------  --------------  ---------------  ----------------  --------------  ----------  --------  ---------  ----------  -----------  -------  ----------------------  -----  ----  ----  --------  -------------  ----------
+# ELEC.PLANT.GEN.10-BIT-ST.M   (10) Greene County (10)   megawatthours   Net generation   bituminous coal   steam turbine   monthly     32.6017   -87.7811   USA-AL      2016-06-01         0  25-JUN-20 12.49.38 AM   2016   06    AL    Alabama   fossil fuels   coal      
+# ELEC.PLANT.GEN.10-BIT-ST.M   (10) Greene County (10)   megawatthours   Net generation   bituminous coal   steam turbine   monthly     32.6017   -87.7811   USA-AL      2016-07-01         0  25-JUN-20 12.49.38 AM   2016   07    AL    Alabama   fossil fuels   coal      
+# ELEC.PLANT.GEN.10-BIT-ST.M   (10) Greene County (10)   megawatthours   Net generation   bituminous coal   steam turbine   monthly     32.6017   -87.7811   USA-AL      2016-08-01         0  25-JUN-20 12.49.38 AM   2016   08    AL    Alabama   fossil fuels   coal      
+# ELEC.PLANT.GEN.10-BIT-ST.M   (10) Greene County (10)   megawatthours   Net generation   bituminous coal   steam turbine   monthly     32.6017   -87.7811   USA-AL      2016-09-01         0  25-JUN-20 12.49.38 AM   2016   09    AL    Alabama   fossil fuels   coal      
+# ELEC.PLANT.GEN.10-BIT-ST.M   (10) Greene County (10)   megawatthours   Net generation   bituminous coal   steam turbine   monthly     32.6017   -87.7811   USA-AL      2016-10-01         0  25-JUN-20 12.49.38 AM   2016   10    AL    Alabama   fossil fuels   coal      
+# ELEC.PLANT.GEN.10-BIT-ST.M   (10) Greene County (10)   megawatthours   Net generation   bituminous coal   steam turbine   monthly     32.6017   -87.7811   USA-AL      2016-11-01         0  25-JUN-20 12.49.38 AM   2016   11    AL    Alabama   fossil fuels   coal
+
+ng <- filter(ng, output > 0)
+
+"
+SME application of fuel categories for respective energy sources
+"
+
+ng <- ng %>%
+  mutate(
+    fuel_cat1 = case_when(
+      energy_source == "natural gas" ~ "fossil fuels",
+      energy_source == "nuclear" ~ "all other fuels",
+      energy_source == "subbituminous coal" ~ "fossil fuels",
+      energy_source == "bituminous coal" ~ "fossil fuels",
+      energy_source == "conventional hydroelectric" ~ "renewable fuels",
+      energy_source == "wind" ~ "renewable fuels",
+      energy_source == "refined coal" ~ "fossil fuels",
+      energy_source == "lignite coal" ~ "fossil fuels",
+      energy_source == "solar" ~ "renewable fuels",
+      energy_source == "wood/wood waste solids" ~ "renewable fuels",
+      energy_source == "black liquour" ~ "renewable fuels",
+      energy_source == "geothermal" ~ "renewable fuels",
+      energy_source == "landfill gas" ~ "renewable fuels",
+      energy_source == "petroleum coke" ~ "fossil fuels",
+      energy_source == "other gas" ~ "fossil fuels",
+      energy_source == "waste/other coal" ~ "fossil fuels",
+      energy_source == "non-biogenic municipal solid waste" ~ "renewable fuels",
+      energy_source == "residual fuel oil" ~ "fossil fuels",
+      energy_source == "biogenic municipal solid waste" ~ "renewable fuels",
+      energy_source == "distillate fuel oil" ~ "fossil fuels",
+      energy_source == "blast furnace gas" ~ "fossil fuels",
+      energy_source == "waste heat" ~ "all other fuels",
+      energy_source == "coal-derived synthetic gas" ~ "fossil fuels",
+      energy_source == "other biomass gas" ~ "renewable fuels",
+      energy_source == "purchased steam" ~ "all other fuels",
+      energy_source == "tire-derived fuels" ~ "all other fuels",
+      energy_source == "other" ~ "all other fuels",
+      energy_source == "agricultural by-products" ~ "renewable fuels",
+      energy_source == "waste/other oil" ~ "fossil fuels",
+      energy_source == "other biomass solids" ~ "renewable fuels",
+      energy_source == "kerosene" ~ "fossil fuels",
+      energy_source == "jet fuel" ~ "fossil fuels",
+      energy_source == "wood waste liquids ex. black liqour" ~ "renewable fuels",
+      energy_source == "sludge waste" ~ "renewable fuels",
+      energy_source == "other biomass liquids" ~ "renewable fuels",
+      energy_source == "gaseous propane" ~ "fossil fuels",
+      energy_source == "batteries or other use of electricity as an energy source" ~ "all other fuels"
+    )
+  ) %>%
+  mutate(
+    fuel_cat2 = case_when(
+      energy_source == "natural gas" ~ "natural gas and other gases",
+      energy_source == "nuclear" ~ "all other fuels",
+      energy_source == "subbituminous coal" ~ "coal",
+      energy_source == "bituminous coal" ~ "coal",
+      energy_source == "conventional hydroelectric" ~ "other renewable fuels",
+      energy_source == "wind" ~ "other renewable fuels",
+      energy_source == "refined coal" ~ "coal",
+      energy_source == "lignite coal" ~ "coal",
+      energy_source == "solar" ~ "other renewable fuels",
+      energy_source == "wood/wood waste solids" ~ "solid renewable fuels",
+      energy_source == "black liquour" ~ "liquid renewable fuels",
+      energy_source == "geothermal" ~ "other renewable fuels",
+      energy_source == "landfill gas" ~ "gaseous renewable fuels",
+      energy_source == "petroleum coke" ~ "petroleum products",
+      energy_source == "other gas" ~ "natural gas and other gases",
+      energy_source == "waste/other coal" ~ "coal",
+      energy_source == "non-biogenic municipal solid waste" ~ "solid renewable fuels",
+      energy_source == "residual fuel oil" ~ "petroleum products",
+      energy_source == "biogenic municipal solid waste" ~ "solid renewable fuels",
+      energy_source == "distillate fuel oil" ~ "petroleum products",
+      energy_source == "blast furnace gas" ~ "natural gas and other gases",
+      energy_source == "waste heat" ~ "all other fuels",
+      energy_source == "coal-derived synthetic gas" ~ "coal",
+      energy_source == "other biomass gas" ~ "gaseous renewable fuels",
+      energy_source == "purchased steam" ~ "all other fuels",
+      energy_source == "tire-derived fuels" ~ "all other fuels",
+      energy_source == "other" ~ "all other fuels",
+      energy_source == "agricultural by-products" ~ "solid renewable fuels",
+      energy_source == "waste/other oil" ~ "petroleum products",
+      energy_source == "other biomass solids" ~ "solid renewable fuels",
+      energy_source == "kerosene" ~ "petroleum products",
+      energy_source == "jet fuel" ~ "petroleum products",
+      energy_source == "wood waste liquids ex. black liqour" ~ "solid renewable fuels",
+      energy_source == "sludge waste" ~ "liquid renewable fuels",
+      energy_source == "other biomass liquids" ~ "liquid renewable fuels",
+      energy_source == "gaseous propane" ~ "petroleum products",
+      energy_source == "batteries or other use of electricity as an energy source" ~ "all other fuels"
+    )
+  )
+
+"
+Check the energy source to fuel category mappings
+"
+
+ng %>%
+  group_by(
+    energy_source,
+    fuel_cat1
+  ) %>%
+  summarize(
+    output = sum(output, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(
+    fuel_cat1
+  ) %>%
+  mutate(
+    fuel_cat1_output = sum(output)
+  ) %>%
+  arrange(
+    desc(fuel_cat1_output),
+    desc(output)
+  ) %>%
+  select(
+    -fuel_cat1_output
+  ) %>%
+  pivot_wider(
+    names_from = fuel_cat1,
+    values_from = output
+  ) %>%
+  mutate(
+    across(where(is.numeric), ~ replace_na(.x, 0)),
+    across(where(is.numeric), ~ label_number(scale_cut = cut_short_scale())(.x))
+  ) %>%
+  kable(
+    "simple"
+  )
+
+# energy_source                                               fossil fuels   all other fuels   renewable fuels   NA     
+# ----------------------------------------------------------  -------------  ----------------  ----------------  -------
+# natural gas                                                 14.44B         0                 0                 0      
+# subbituminous coal                                          5.36B          0                 0                 0      
+# bituminous coal                                             5.10B          0                 0                 0      
+# refined coal                                                1.58B          0                 0                 0      
+# lignite coal                                                578.69M        0                 0                 0      
+# petroleum coke                                              94.43M         0                 0                 0      
+# other gas                                                   91.22M         0                 0                 0      
+# waste/other coal                                            84.79M         0                 0                 0      
+# residual fuel oil                                           72.38M         0                 0                 0      
+# distillate fuel oil                                         60.17M         0                 0                 0      
+# blast furnace gas                                           35.03M         0                 0                 0      
+# coal-derived synthetic gas                                  24.87M         0                 0                 0      
+# waste/other oil                                             7.47M          0                 0                 0      
+# kerosene                                                    2.28M          0                 0                 0      
+# jet fuel                                                    1.70M          0                 0                 0      
+# gaseous propane                                             117K           0                 0                 0      
+# nuclear                                                     0              8B                0                 0      
+# waste heat                                                  0              34.96M            0                 0      
+# purchased steam                                             0              11.46M            0                 0      
+# tire-derived fuels                                          0              9.81M             0                 0      
+# other                                                       0              9.60M             0                 0      
+# batteries or other use of electricity as an energy source   0              65K               0                 0      
+# conventional hydroelectric                                  0              0                 2.72B             0      
+# wind                                                        0              0                 2.50B             0      
+# solar                                                       0              0                 499.71M           0      
+# wood/wood waste solids                                      0              0                 202.32M           0      
+# black liquour                                               0              0                 183.28M           0      
+# geothermal                                                  0              0                 155.61M           0      
+# landfill gas                                                0              0                 101.29M           0      
+# non-biogenic municipal solid waste                          0              0                 74.65M            0      
+# biogenic municipal solid waste                              0              0                 71.84M            0      
+# other biomass gas                                           0              0                 11.74M            0      
+# agricultural by-products                                    0              0                 7.77M             0      
+# other biomass solids                                        0              0                 6.38M             0      
+# wood waste liquids ex. black liqour                         0              0                 1.69M             0      
+# sludge waste                                                0              0                 1.01M             0      
+# other biomass liquids                                       0              0                 571K              0      
+#                                                             0              0                 0                 5M     
+# 2303-III-4 Hamburg Tpke (62722)                             0              0                 0                 11.88K 
+# 2303-III-2 Hamburg Tpke (62723)                             0              0                 0                 11.70K 
+# 2303-III-9 Hamburg Tpke (62721)                             0              0                 0                 7.59K
+
+ng %>%
+  group_by(
+    energy_source,
+    fuel_cat2
+  ) %>%
+  summarize(
+    output = sum(output, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(
+    fuel_cat2
+  ) %>%
+  mutate(
+    fuel_cat2_output = sum(output)
+  ) %>%
+  arrange(
+    desc(fuel_cat2_output),
+    desc(output)
+  ) %>%
+  select(
+    -fuel_cat2_output
+  ) %>%
+  pivot_wider(
+    names_from = fuel_cat2,
+    values_from = output
+  ) %>%
+  mutate(
+    across(where(is.numeric), ~ replace_na(.x, 0)),
+    across(where(is.numeric), ~ label_number(scale_cut = cut_short_scale())(.x))
+  ) %>%
+  kable(
+    "simple"
+  )
+
+# energy_source                                               natural gas and other gases   coal    all other fuels   other renewable fuels   solid renewable fuels   petroleum products   liquid renewable fuels   gaseous renewable fuels   NA     
+# ----------------------------------------------------------  ----------------------------  ------  ----------------  ----------------------  ----------------------  -------------------  -----------------------  ------------------------  -------
+# natural gas                                                 14B                           0       0                 0                       0                       0                    0                        0                         0      
+# other gas                                                   91M                           0       0                 0                       0                       0                    0                        0                         0      
+# blast furnace gas                                           35M                           0       0                 0                       0                       0                    0                        0                         0      
+# subbituminous coal                                          0                             5.36B   0                 0                       0                       0                    0                        0                         0      
+# bituminous coal                                             0                             5.10B   0                 0                       0                       0                    0                        0                         0      
+# refined coal                                                0                             1.58B   0                 0                       0                       0                    0                        0                         0      
+# lignite coal                                                0                             579M    0                 0                       0                       0                    0                        0                         0      
+# waste/other coal                                            0                             85M     0                 0                       0                       0                    0                        0                         0      
+# coal-derived synthetic gas                                  0                             25M     0                 0                       0                       0                    0                        0                         0      
+# nuclear                                                     0                             0       8B                0                       0                       0                    0                        0                         0      
+# waste heat                                                  0                             0       34.96M            0                       0                       0                    0                        0                         0      
+# purchased steam                                             0                             0       11.46M            0                       0                       0                    0                        0                         0      
+# tire-derived fuels                                          0                             0       9.81M             0                       0                       0                    0                        0                         0      
+# other                                                       0                             0       9.60M             0                       0                       0                    0                        0                         0      
+# batteries or other use of electricity as an energy source   0                             0       65K               0                       0                       0                    0                        0                         0      
+# conventional hydroelectric                                  0                             0       0                 2.72B                   0                       0                    0                        0                         0      
+# wind                                                        0                             0       0                 2.50B                   0                       0                    0                        0                         0      
+# solar                                                       0                             0       0                 500M                    0                       0                    0                        0                         0      
+# geothermal                                                  0                             0       0                 156M                    0                       0                    0                        0                         0      
+# wood/wood waste solids                                      0                             0       0                 0                       202.3M                  0                    0                        0                         0      
+# non-biogenic municipal solid waste                          0                             0       0                 0                       74.7M                   0                    0                        0                         0      
+# biogenic municipal solid waste                              0                             0       0                 0                       71.8M                   0                    0                        0                         0      
+# agricultural by-products                                    0                             0       0                 0                       7.8M                    0                    0                        0                         0      
+# other biomass solids                                        0                             0       0                 0                       6.4M                    0                    0                        0                         0      
+# wood waste liquids ex. black liqour                         0                             0       0                 0                       1.7M                    0                    0                        0                         0      
+# petroleum coke                                              0                             0       0                 0                       0                       94.43M               0                        0                         0      
+# residual fuel oil                                           0                             0       0                 0                       0                       72.38M               0                        0                         0      
+# distillate fuel oil                                         0                             0       0                 0                       0                       60.17M               0                        0                         0      
+# waste/other oil                                             0                             0       0                 0                       0                       7.47M                0                        0                         0      
+# kerosene                                                    0                             0       0                 0                       0                       2.28M                0                        0                         0      
+# jet fuel                                                    0                             0       0                 0                       0                       1.70M                0                        0                         0      
+# gaseous propane                                             0                             0       0                 0                       0                       117K                 0                        0                         0      
+# black liquour                                               0                             0       0                 0                       0                       0                    183M                     0                         0      
+# sludge waste                                                0                             0       0                 0                       0                       0                    1M                       0                         0      
+# other biomass liquids                                       0                             0       0                 0                       0                       0                    571K                     0                         0      
+# landfill gas                                                0                             0       0                 0                       0                       0                    0                        101M                      0      
+# other biomass gas                                           0                             0       0                 0                       0                       0                    0                        12M                       0      
+#                                                             0                             0       0                 0                       0                       0                    0                        0                         5M     
+# 2303-III-4 Hamburg Tpke (62722)                             0                             0       0                 0                       0                       0                    0                        0                         11.88K 
+# 2303-III-2 Hamburg Tpke (62723)                             0                             0       0                 0                       0                       0                    0                        0                         11.70K 
+# 2303-III-9 Hamburg Tpke (62721)                             0                             0       0                 0                       0                       0                    0                        0                         7.59K
+
+"
+A couple oddball entries left. They're so small that we're safe removing them
+"
+
+ng <- ng %>%
+  filter(
+    !energy_source %in% "" &
+    grepl("Hamburg Tpke", energy_source) == FALSE
+  )
+
+# Full year sets
+fy <- ng %>% 
+  group_by(
+    yr
+  ) %>% 
+  summarize(
+    mths = length(unique(mth))
+  ) %>%
+  filter(
+    mths == 12
+  ) %>%
+  pull(
+    yr
+  )
+
+ng <- filter(ng, yr %in% fy)
 
 # Electricity costs ---------------------------------------
 
@@ -430,7 +751,7 @@ ec %>%
 # Pacific Noncontiguous (total)   2016-07-01   residential                                             714088                                                        25.38                                                         NA                                            372.0881         NA
 # Pacific Noncontiguous (total)   2016-08-01   residential                                             715524                                                        24.95                                                         NA                                                  NA         NA
 # Pacific Noncontiguous (total)   2016-09-01   residential                                             715918                                                        25.07                                                         NA                                                  NA         NA
-# Pacific Noncontiguous (total)   2016-12-01   residential                                
+# Pacific Noncontiguous (total)   2016-12-01   residential                                             715955                                                        23.99                                                         NA                                            456.9238         NA
 
 "
 Alaska and by extension the noncontiguous Pacific had a bad 2016 reporting-wise
@@ -444,7 +765,7 @@ ec <- ec %>%
 
 # Data viz -------------------------------------------------------------------
 
-# Linear models by state ----------------------------------
+# Total generation by state and year ----------------------
 
 ngsy <- ng %>%
   group_by(
@@ -454,7 +775,123 @@ ngsy <- ng %>%
   summarize(
     output = sum(output, na.rm = TRUE),
     .groups = "drop"
+  ) %>%
+  group_by(
+    state
+  ) %>%
+  mutate(
+    state_output = sum(output)
+  ) %>%
+  ungroup() %>%
+  arrange(
+    desc(state_output)
+  ) %>%
+  mutate(
+    state = factor(state, unique(state))
   )
+
+p01 <- ggplot() +
+  geom_bar(
+    data = ngsy,
+    aes(
+      x = yr,
+      y = output
+    ),
+    stat = "identity"
+  ) +
+  scale_y_continuous(
+    labels = label_number(scale_cut = cut_short_scale())
+  ) +
+  facet_wrap(
+    ~ state
+  ) +
+  labs(
+    x = "Year",
+    y = "Output (MWh)"
+  ) +
+  guides(
+    x = guide_axis(angle = 45)
+  ) +
+  theme_grey(
+    base_size = 18
+  )
+
+ggsave(
+  "./output/p01.png",
+  p01,
+  height = 16,
+  width = 25
+)
+
+# Total generation by category by state by year -----------
+
+ngcsy <- ng %>%
+  group_by(
+    state,
+    fuel_cat1,
+    yr
+  ) %>%
+  summarize(
+    output = sum(output, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    state = factor(state, levels(ngsy$state))
+  )
+
+p02 <- ggplot() +
+  geom_bar(
+    data = ngcsy,
+    aes(
+      x = yr,
+      y = output,
+      fill = fuel_cat1
+    ),
+    stat = "identity"
+  ) +
+  scale_y_continuous(
+    labels = label_number(scale_cut = cut_short_scale())
+  ) +
+  facet_wrap(
+    ~ state
+  ) +
+  labs(
+    x = "Year",
+    y = "Output (MWh)",
+    fill = "Fuel Category"
+  ) +
+  guides(
+    x = guide_axis(angle = 45)
+  ) +
+  theme_grey(
+    base_size = 18
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+
+ggsave(
+  "./output/p02.png",
+  p02,
+  height = 16,
+  width = 25
+)
+
+# Normalized
+p03 <- p02 %+% 
+  facet_wrap(
+    ~ state,
+    scales = "free_y"
+  )
+
+ggsave(
+  "./output/p03.png",
+  p03,
+  height = 16,
+  width = 25
+)
+
+# Cost by state by year -----------------------------------
 
 ecsy <- ec %>%
   rename(
@@ -468,36 +905,116 @@ ecsy <- ec %>%
   summarize(
     average_price = sum(revenue, na.rm = TRUE) / sum(sales, na.rm = TRUE),
     .groups = "drop"
+  ) %>%
+  mutate(
+    state = factor(state, levels(ngsy$state))
   )
 
 lms <- left_join(ngsy, ecsy, by = c("state", "yr"))
-lms <- filter(lms, yr < 2022) # Only full years
 
-ggplot() +
+p04 <- ggplot() +
   geom_point(
     data = lms,
     aes(
-      x = output / 1e6,
-      y = average_price
-    )
-  ) +
-  geom_smooth(
-    data = lms,
-    aes(
-      x = output / 1e6,
+      x = yr,
       y = average_price
     ),
-    method = "lm",
-    se = FALSE
-  ) +
-  facet_wrap(
-    ~ state,
-    scales = "free"
+    size = 3
   ) +
   scale_y_continuous(
-    labels = function(x) scales::dollar(x, accuracy = .001)
+    labels = label_dollar()
+  ) +
+  facet_wrap(
+    ~ state
   ) +
   labs(
-    x = "Output GWh",
-    y = "Average Price"
+    x = "Year",
+    y = "Cost per KWh",
+    fill = "Fuel Category"
+  ) +
+  guides(
+    x = guide_axis(angle = 45)
+  ) +
+  theme_grey(
+    base_size = 18
+  )
+
+ggsave(
+  "./output/p04.png",
+  p04,
+  height = 16,
+  width = 25
+)
+
+# Mapping ---------------------------------------------------------------------
+
+top10 <- ng %>%
+  group_by(
+    plant
+  ) %>%
+  mutate(
+    total_output = sum(output)
+  ) %>%
+  group_by(
+    state
+  ) %>%
+  mutate(
+    rk = dense_rank(-total_output)
+  ) %>%
+  filter(
+    rk <= 10 &
+    output > 0
+  ) %>%
+  group_by(
+    state,
+    plant,
+    lat,
+    lon
+  ) %>%
+  summarize(
+    energy_source = paste0(unique(energy_source), collapse = " | "),
+    prime_mover = paste0(unique(prime_mover), collapse = " | "),
+    output = max(output),
+    .groups = "drop"
+  )
+
+tx <- filter(top10, state == "Texas")
+
+coords <- tx %>%
+  mutate(
+    label = paste(plant, energy_source, prime_mover, sep = "<br>"),
+    label = lapply(label, htmltools::HTML)
+  ) %>%
+  group_by(
+    label,
+    lat,
+    lon
+  ) %>%
+  summarize(
+    output = sum(output),
+    .groups = "drop"
+  ) %>%
+  st_as_sf(
+    coords = c("lon", "lat")
+  )
+
+leaflet(coords) %>% 
+  addProviderTiles("Esri.WorldImagery") %>%
+  addProviderTiles("CartoDB.PositronOnlyLabels") %>%
+  addLabelOnlyMarkers(
+    data = coords, 
+    label = ~ label,
+    labelOptions = labelOptions(
+      noHide = TRUE, 
+      direction = 'top', 
+      textOnly = FALSE,
+      opacity = .5,
+      style = list(
+        'color' = 'black',
+        'font-family' = 'sans-serif',
+        'font-size' = '12px',
+        'background-color' = '#FBF9E6',
+        'border-color' = 'rgba(0, 0, 0, .5)'
+      )
+    )
   )
