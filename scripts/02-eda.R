@@ -8,6 +8,7 @@
 library(dplyr) # Data wrangling
 library(ggplot2) # Data viz
 library(knitr) # Inline data tables
+library(scales) # Data formatting
 library(sf) # Mapping
 library(tidyr) # Data wrangling
 
@@ -589,6 +590,8 @@ fy <- ng %>%
 
 ng <- filter(ng, yr %in% fy)
 
+saveRDS(ng, "./output/plant-generation-tidy.RData")
+
 # Electricity costs ---------------------------------------
 
 missing_counts <- data.frame(lapply(ec, function(x) length(x[is.na(x)])))
@@ -762,6 +765,8 @@ ec <- ec %>%
     yr = format(ds, "%Y"),
     mth = format(ds, "%m")
   )
+
+saveRDS(ec, "./output/electricity-costs-tidy.RData")
 
 # Data viz -------------------------------------------------------------------
 
